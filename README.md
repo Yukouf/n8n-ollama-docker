@@ -2,6 +2,8 @@
 
 Ce guide explique comment installer et configurer **n8n** (outil d'automatisation) et **Ollama** (LLM local) pour les faire fonctionner ensemble.
 
+> Il s'agit d'un guide illustré, pas d'une stack `docker-compose` prête à déployer.
+
 ---
 
 ## 📋 Prérequis
@@ -52,6 +54,12 @@ docker run -it --rm \
   -e N8N_RUNNERS_ENABLED=true \
   -v n8n_data:/home/node/.n8n \
   docker.n8n.io/n8nio/n8n
+```
+
+Sur **Docker Engine Linux**, ajoutez également l'alias vers l'hôte à la commande `docker run` :
+
+```bash
+--add-host=host.docker.internal:host-gateway
 ```
 
 ![Commandes Docker depuis la doc n8n](assets/03-docker-doc-commands.png)
@@ -113,7 +121,7 @@ Ajouter un nœud **Ollama Chat Model** avec la configuration suivante :
 | Base URL | `http://host.docker.internal:11434` |
 | API Key | *(laisser vide pour une installation Ollama standard)* |
 
-> ⚠️ L'URL `host.docker.internal` permet au conteneur Docker d'accéder à Ollama qui tourne sur la machine hôte.
+> ⚠️ L'URL `host.docker.internal` permet au conteneur d'accéder à Ollama sur l'hôte. Sous Docker Engine Linux, elle nécessite généralement l'option `--add-host=host.docker.internal:host-gateway` montrée plus haut.
 
 ![Configuration Ollama dans n8n](assets/06-n8n-ollama-config.png)
 
@@ -124,14 +132,13 @@ Ajouter un nœud **Ollama Chat Model** avec la configuration suivante :
 Le workflow de base pour connecter Ollama à n8n doit ressembler à ceci :
 
 ```
-[Execute Workflow] → [When chat message received] → [Basic LLM Chain] → [Ollama Chat Model]
+[When chat message received] → [Basic LLM Chain] → [Ollama Chat Model]
 ```
 
 Les nœuds à ajouter :
-1. **When clicking 'Execute workflow'** (trigger manuel)
-2. **When chat message received** (trigger chat)
-3. **Basic LLM Chain** (chaîne LLM)
-4. **Ollama Chat Model** (modèle connecté à Ollama)
+1. **When chat message received** (trigger chat)
+2. **Basic LLM Chain** (chaîne LLM)
+3. **Ollama Chat Model** (modèle connecté à Ollama)
 
 ![Workflow final n8n + Ollama](assets/07-n8n-workflow-final.jpeg)
 
