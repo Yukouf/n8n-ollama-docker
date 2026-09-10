@@ -1,46 +1,51 @@
-# 🤖 Connecter n8n à Ollama via Docker
+# 🤖 Connecting n8n to Ollama via Docker
 
-Ce guide explique comment installer et configurer **n8n** (outil d'automatisation) et **Ollama** (LLM local) pour les faire fonctionner ensemble.
+<p align="center">
+  <a href="README.md">English</a> &bull;
+  <a href="README_fr.md">Français</a>
+</p>
 
-> Il s'agit d'un guide illustré, pas d'une stack `docker-compose` prête à déployer.
+This guide explains how to install and configure **n8n** (automation tool) and **Ollama** (local LLM) so they work together.
 
----
-
-## 📋 Prérequis
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé
-- [Ollama](https://ollama.com/) installé
-- PowerShell (Windows) ou Terminal (Mac/Linux)
+> This is an illustrated guide, not a ready-to-deploy `docker-compose` stack.
 
 ---
 
-## 🐳 Étape 1 — Créer un volume Docker
+## 📋 Prerequisites
 
-Dans Docker Desktop, aller dans **Volumes** et créer un volume nommé :
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed
+- [Ollama](https://ollama.com/) installed
+- PowerShell (Windows) or Terminal (Mac/Linux)
+
+---
+
+## 🐳 Step 1: Create a Docker volume
+
+In Docker Desktop, go to **Volumes** and create a volume named:
 
 ```
 n8n_data
 ```
 
-![Création du volume n8n_data](assets/01-docker-volume.png)
+![Creating the n8n_data volume](assets/01-docker-volume.png)
 
 ---
 
-## 📦 Étape 2 — Télécharger l'image n8n
+## 📦 Step 2: Download the n8n image
 
-Dans Docker Desktop, aller dans l'onglet **Images**, rechercher `n8n` et sélectionner le premier résultat :
+In Docker Desktop, go to the **Images** tab, search for `n8n` and select the first result:
 
 ```
 n8nio/n8n
 ```
 
-![Recherche de l'image n8n](assets/02-docker-image-n8n.png)
+![Searching for the n8n image](assets/02-docker-image-n8n.png)
 
 ---
 
-## 🚀 Étape 3 — Lancer le conteneur n8n
+## 🚀 Step 3: Run the n8n container
 
-Depuis la documentation officielle n8n, utiliser les commandes suivantes dans le terminal :
+From the official n8n documentation, use the following commands in the terminal:
 
 ```bash
 docker volume create n8n_data
@@ -56,17 +61,17 @@ docker run -it --rm \
   docker.n8n.io/n8nio/n8n
 ```
 
-Sur **Docker Engine Linux**, ajoutez également l'alias vers l'hôte à la commande `docker run` :
+On **Docker Engine Linux**, also add the host alias to the `docker run` command:
 
 ```bash
 --add-host=host.docker.internal:host-gateway
 ```
 
-![Commandes Docker depuis la doc n8n](assets/03-docker-doc-commands.png)
+![Docker commands from the n8n docs](assets/03-docker-doc-commands.png)
 
-Ou via l'interface Docker Desktop avec ces paramètres :
+Or via the Docker Desktop interface with these settings:
 
-| Paramètre | Valeur |
+| Setting | Value |
 |---|---|
 | Host port | `5678` |
 | Host path (volume) | `n8n_data` |
@@ -76,76 +81,76 @@ Ou via l'interface Docker Desktop avec ces paramètres :
 | `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS` | `true` |
 | `N8N_RUNNERS_ENABLED` | `true` |
 
-![Configuration du conteneur n8n](assets/03-docker-container-config.png)
+![n8n container configuration](assets/03-docker-container-config.png)
 
 ---
 
-## 🌐 Étape 4 — Accéder à n8n
+## 🌐 Step 4: Access n8n
 
-Une fois le conteneur lancé, ouvrir dans le navigateur :
+Once the container is running, open in the browser:
 
 ```
 http://localhost:5678
 ```
 
-Créer un compte owner pour accéder à l'interface.
+Create an owner account to access the interface.
 
-![Page de création de compte n8n](assets/04-n8n-setup-account.jpeg)
+![n8n account creation page](assets/04-n8n-setup-account.jpeg)
 
 ---
 
-## 🧠 Étape 5 — Démarrer Ollama
+## 🧠 Step 5: Start Ollama
 
-Télécharger et installer [Ollama](https://ollama.com/), puis lancer le serveur dans PowerShell :
+Download and install [Ollama](https://ollama.com/), then start the server in PowerShell:
 
 ```powershell
 ollama serve
 ```
 
-Ollama servira de modèle de langage (cerveau) pour les workflows n8n.
+Ollama will serve as the language model (brain) for the n8n workflows.
 
-![Terminal avec ollama serve actif](assets/05-ollama-serve.jpeg)
+![Terminal with ollama serve running](assets/05-ollama-serve.jpeg)
 
 ---
 
-## ⚙️ Étape 6 — Configurer Ollama dans n8n
+## ⚙️ Step 6: Configure Ollama in n8n
 
-Dans n8n, lors de la création d'un workflow, commencer par créer un nouveau workflow vide.
+In n8n, when creating a workflow, start by creating a new empty workflow.
 
-![Workflow vide dans n8n](assets/06-n8n-workflow-empty.png)
+![Empty workflow in n8n](assets/06-n8n-workflow-empty.png)
 
-Ajouter un nœud **Ollama Chat Model** avec la configuration suivante :
+Add an **Ollama Chat Model** node with the following configuration:
 
-| Champ | Valeur |
+| Field | Value |
 |---|---|
 | Base URL | `http://host.docker.internal:11434` |
-| API Key | *(laisser vide pour une installation Ollama standard)* |
+| API Key | *(leave empty for a standard Ollama install)* |
 
-> ⚠️ L'URL `host.docker.internal` permet au conteneur d'accéder à Ollama sur l'hôte. Sous Docker Engine Linux, elle nécessite généralement l'option `--add-host=host.docker.internal:host-gateway` montrée plus haut.
+> ⚠️ The `host.docker.internal` URL lets the container reach Ollama on the host. On Docker Engine Linux, it generally requires the `--add-host=host.docker.internal:host-gateway` option shown above.
 
-![Configuration Ollama dans n8n](assets/06-n8n-ollama-config.png)
+![Ollama configuration in n8n](assets/06-n8n-ollama-config.png)
 
 ---
 
-## 🔗 Étape 7 — Créer le workflow final
+## 🔗 Step 7: Create the final workflow
 
-Le workflow de base pour connecter Ollama à n8n doit ressembler à ceci :
+The basic workflow to connect Ollama to n8n should look like this:
 
 ```
 [When chat message received] → [Basic LLM Chain] → [Ollama Chat Model]
 ```
 
-Les nœuds à ajouter :
-1. **When chat message received** (trigger chat)
-2. **Basic LLM Chain** (chaîne LLM)
-3. **Ollama Chat Model** (modèle connecté à Ollama)
+The nodes to add:
+1. **When chat message received** (chat trigger)
+2. **Basic LLM Chain** (LLM chain)
+3. **Ollama Chat Model** (model connected to Ollama)
 
-![Workflow final n8n + Ollama](assets/07-n8n-workflow-final.jpeg)
+![Final n8n + Ollama workflow](assets/07-n8n-workflow-final.jpeg)
 
 ---
 
-## 📚 Ressources
+## 📚 Resources
 
-- [Documentation n8n - Installation Docker](https://docs.n8n.io/hosting/installation/docker/)
+- [n8n documentation - Docker installation](https://docs.n8n.io/hosting/installation/docker/)
 - [Ollama](https://ollama.com/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
